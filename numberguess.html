@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Number Guessing Game</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; }
+    input, button { margin: 0.5rem 0; }
+    #gameArea { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Number Guessing Game</h1>
+  <div id="startGame">
+    <label>Minimum Number: <input type="number" id="min" /></label><br>
+    <label>Maximum Number: <input type="number" id="max" /></label><br>
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <div id="gameArea">
+    <p id="status"></p>
+    <label>Enter your guess: <input type="number" id="guess" /></label>
+    <button onclick="makeGuess()">Guess</button><br>
+    <p id="feedback"></p>
+    <button id="playAgain" onclick="resetGame()" style="display:none;">Play Again</button>
+  </div>
+
+  <script>
+    let money = 50, count = 0, attempts = 0, numberToGuess, min, max;
+
+    function startGame() {
+      min = parseInt(document.getElementById("min").value);
+      max = parseInt(document.getElementById("max").value);
+      if (isNaN(min) || isNaN(max) || min >= max) {
+        alert("Enter a valid number range.");
+        return;
+      }
+      numberToGuess = Math.floor(Math.random() * (max - min + 1)) + min;
+      attempts = 0;
+      document.getElementById("status").textContent = `You have $${money}. Each guess costs $5.`;
+      document.getElementById("startGame").style.display = "none";
+      document.getElementById("gameArea").style.display = "block";
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function makeGuess() {
+      const guess = parseInt(document.getElementById("guess").value);
+      if (money <= 0) {
+        document.getElementById("feedback").textContent = "You're broke. Game over.";
+        return;
+      }
+      if (guess < min || guess > max || isNaN(guess)) {
+        money -= 5;
+        document.getElementById("feedback").textContent = `Invalid guess. Stay within ${min}-${max}. $${money} left.`;
+        return;
+      }
+
+      money -= 5;
+      attempts++;
+      if (guess < numberToGuess) {
+        document.getElementById("feedback").textContent = `Go higher! $${money} left.`;
+      } else if (guess > numberToGuess) {
+        document.getElementById("feedback").textContent = `Go lower! $${money} left.`;
+      } else {
+        let winnings = (attempts === 1) ? 100 : 50;
+        money += winnings;
+        count++;
+        document.getElementById("feedback").textContent =
+          `You got it in ${attempts} attempt(s)! You win $${winnings}. Total: $${money}`;
+        document.getElementById("playAgain").style.display = "inline";
+      }
+
+      if (money <= 0) {
+        document.getElementById("feedback").textContent += " You're out of cash. Game over.";
+      }
+    }
+
+    function resetGame() {
+      document.getElementById("gameArea").style.display = "none";
+      document.getElementById("startGame").style.display = "block";
+      document.getElementById("playAgain").style.display = "none";
+    }
+  </script>
+</body>
+</html>
